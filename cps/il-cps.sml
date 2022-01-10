@@ -1,0 +1,3 @@
+structure ILCPS =
+struct
+end
