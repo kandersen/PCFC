@@ -1,5 +1,8 @@
 structure ILAST =
 struct
+  structure Variable = Variable()
+  structure VarMap = VarMap(structure V = Variable)
+
   datatype ty
     = TArr of ty * ty
     | TNat
@@ -16,13 +19,13 @@ struct
   fun pprint_ty ty =
       case ty of
           TNat =>
-          "num"
+          "nat"
         | TArr(t1, t2) =>
           pprint_ty t1 ^ " -> " ^ pprint_ty t2
 
   fun pprint_exp e =
       case e of
-          EVar x => "var[" ^ Variable.pprint x ^ "]"
+          EVar x => Variable.pprint x
         | EApp(e1, e2) => "(" ^ pprint_exp e1 ^ ") (" ^ pprint_exp e2 ^ ")"
         | EIfz(n,z,(n',s)) =>
           "ifz " ^ pprint_exp n ^ " {\n" ^

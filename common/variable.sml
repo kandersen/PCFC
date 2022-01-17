@@ -2,34 +2,35 @@ signature VARIABLE =
 sig
     type t
 
-    val fresh : unit -> t
+    val fresh : string -> t
     val eqvar : t -> t -> bool
     val compare : (t * t) -> order
     val pprint : t -> string
+    val disamb : t -> string
 end
 
-structure Variable :> VARIABLE =
+functor Variable() :> VARIABLE =
 struct
-    type t = int
+    type t = int * string
 
     val nextVar = ref 0
-    fun fresh () =
+    fun fresh s =
         let
             val v = !nextVar
         in
             nextVar := v + 1;
-            v
+            (v, s)
         end
 
-    fun eqvar (v1 : int) v2 = v1 = v2
+    fun eqvar ((n1, _) : t) (n2, _) = n1 = n2
 
-    val compare = Int.compare
+    fun compare ((n1, _), (n2, _) : t)= Int.compare(n1, n2)
 
-    fun pprint v = "[" ^ Int.toString v ^ "]"
+    fun pprint (v, s) = s
+
+    fun disamb (v, s) = s ^ Int.toString v
 end
 
-structure VarOrdKey : ORD_KEY =
-struct
-  type ord_key = Variable.t
-  val compare = Variable.compare
-end
+functor VarMap(structure V : VARIABLE) : ORD_MAP =
+  RedBlackMapFn(type ord_key = V.t
+                val compare = V.compare)

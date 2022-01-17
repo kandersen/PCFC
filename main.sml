@@ -2,22 +2,19 @@ structure Tests =
 struct
   open ILAST
 
-  val varn = Variable.fresh()
-  val varx = Variable.fresh()
-  val varrec = Variable.fresh()
-  val varm = Variable.fresh()
-  val apprecx = EApp (EVar varrec, EVar varx)
-  val appapprecxn = EApp(apprecx, EVar varn)
-  val succbranch = ESucc appapprecxn
-  val zerobranch = EVar varn
-  val ifzexp = EIfz(EVar varm, zerobranch, (varx, succbranch))
-  val lamn = ELam(TNat, (varn, ifzexp))
-  val lamm = ELam(TNat, (varm, lamn))
-  val plus = EFix(TArr(TNat,TArr(TNat,TNat)), (varrec, lamm))
-  val SOME(TArr (TNat, TArr(TNat, TNat))) = ASTCheck.infer (ASTCheck.emptytenv) plus
+  val zero = EZero
+  fun succ e = ESucc e
+  fun ifz e1 e2 x e3 = EIfz(e1, e2, (x, e3))
+  fun lam ty x e = ELam(ty, (x, e))
+  fun app e1 e2 = EApp(e1, e2)
+  fun fix ty x e = EFix(ty, (x, e))
+  fun var x = EVar x
 
-  fun embed 0 = EZero
-    | embed n = ESucc(embed(n - 1))
+  val nat = TNat
+  fun arr t1 t2 = TArr(t1, t2)
+
+  fun embed 0 = zero
+    | embed n = succ (embed (n - 1))
 
   fun extract EZero =
       SOME 0
@@ -27,27 +24,43 @@ struct
          | NONE => NONE)
     | extract _ = NONE
 
-  val five = EApp(EApp(plus, embed 2), embed 3)
-  val SOME TNat = ASTCheck.infer (ASTCheck.emptytenv) five
-  val SOME 5 = extract (ASTInterpreter.reduce five)
-               handle
-               ASTInterpreter.RuntimeError e =>
-               let val () = print e in NONE end
-end
+  local
+      open CPSEval
+  in
+  fun extract_cps RVZero =
+      SOME 0
+    | extract_cps (RVSucc n) =
+      (case extract_cps n of
+           SOME n' => SOME (n' + 1)
+         | NONE => NONE)
+    | extract_cps _ = NONE
+  end
 
-
-structure Main =
-struct
-  open Tests
-
-  fun main (prog_name, args) =
+  fun run_test n e =
       let
-          val () = print (ILAST.pprint_exp five)
-          val () = print (ILAST.pprint_exp (ASTInterpreter.reduce five))
+          val _ =
+              print (pprint_exp e ^ "\n")
+          val SOME t1 = ASTCheck.check e
+          val _ = print (pprint_ty t1 ^ "\n")
+          val SOME r1 = extract (ASTContexts.reduce e)
+          val true = r1 = n
+          val c = CPSTransform.transform e
+          val () = CPSCheck.check c
+          val _ = print (PPrintCPS.prettyprint c ^ "\n")
+          val v = CPSEval.eval c
+          val SOME r2 = extract_cps v
+          val true = r2 = n
       in
-          1
+          print "OK\n\n"
       end
-end
 
-val () = print (ILAST.pprint_exp Tests.five)
-val () = print (ILAST.pprint_exp (ASTInterpreter.reduce Tests.five))
+  val () = run_test 0 zero
+
+  val () = run_test 5 (embed 5)
+
+  val () =
+      let val x = Variable.fresh("x") in
+          run_test 0 (app (lam nat x (var x)) zero)
+      end
+
+end

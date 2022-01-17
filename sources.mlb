@@ -1,10 +1,19 @@
 $(SML_LIB)/basis/basis.mlb
 $(SML_LIB)/smlnj-lib/Util/smlnj-lib.mlb
 
+
 common/variable.sml
+common/pprint.sig
 
 ast/il-ast.sml
 ast/ast-check.sml
 ast/ast-interpreter.sml
+ast/ast-contexts.sml
 
-main.sml
+cps/il-cps.sml
+cps/pprint-cps.sml
+cps/cps-interpreter.sml
+cps/cps-check.sml
+
+translate/cps-transform.sig
+translate/cps-transform.sml

@@ -4,10 +4,20 @@ is
   $/smlnj-lib.cm
 
   common/variable.sml
+  common/pprint.sig
 
   ast/il-ast.sml
   ast/ast-check.sml
   ast/ast-interpreter.sml
+  ast/ast-contexts.sml
+
+  cps/il-cps.sml
+  cps/cps-pprint.sml
+  cps/cps-check.sml
+  cps/cps-interpreter.sml
+
+  translate/cps-transform.sig
+  translate/cps-transform.sml
 
   main.sml
 

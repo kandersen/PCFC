@@ -3,18 +3,17 @@ sig
     type tenv
     exception TypeError
 
-    val emptytenv : tenv
-    val assert : tenv -> ILAST.exp -> ILAST.ty -> unit
-    val infer : tenv -> ILAST.exp -> ILAST.ty option
+    val check : ILAST.exp -> ILAST.ty option
 end
 
 structure ASTCheck : AST_CHECK =
 struct
   open ILAST
   open Variable
+
   exception TypeError
 
-  structure VarDict : ORD_MAP = RedBlackMapFn(VarOrdKey)
+  structure VarDict = VarMap(structure V = Variable)
 
   type tenv = ty VarDict.map
 
@@ -60,5 +59,9 @@ struct
           if t <> t'
           then raise TypeError
           else ()
-       | NONE => raise TypeError
+        | NONE => raise TypeError
+
+  fun check e =
+      infer emptytenv e
+
 end
