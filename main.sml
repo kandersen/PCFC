@@ -36,23 +36,74 @@ struct
     | extract_cps _ = NONE
   end
 
+  fun banner s =
+      print ("********************\n" ^ "* " ^ s ^ "\n********************\n")
+
   fun run_test n e =
-      let
-          val _ =
-              print (pprint_exp e ^ "\n")
-          val SOME t1 = ASTCheck.check e
-          val _ = print (pprint_ty t1 ^ "\n")
-          val SOME r1 = extract (ASTContexts.reduce e)
-          val true = r1 = n
-          val c = CPSTransform.transform e
-          val () = CPSCheck.check c
-          val _ = print (PPrintCPS.prettyprint c ^ "\n")
-          val v = CPSEval.eval c
-          val SOME r2 = extract_cps v
-          val true = r2 = n
+      let 
+          fun run_test n e verbose =
+              let
+                  val (banner, print) =
+                      if verbose
+                      then (banner, print)
+                      else (fn _ => (), fn _ => ())
+              in
+                  let
+                      val () =
+                          (banner "AST Expression";
+                           print (pprint_exp e ^ "\n"))
+                      val () =
+                          banner "AST Checking"
+                      val t1 =
+                          case ASTCheck.check e of
+                              NONE =>  raise Fail "AST expression not well-typed"
+                            | SOME t1 => t1
+                          handle
+                          ASTCheck.TypeError => raise Fail "AST expression not well-typed"
+                      val () =
+                           print (pprint_ty t1 ^ "\n")
+                      val () =
+                          banner "AST Reduction"
+                      val r1 =
+                          case extract (ASTContexts.reduce e) of
+                              NONE => raise Fail "AST expression did not reduce to number"
+                            | SOME r1 => r1
+                      val () =
+                          if r1 = n
+                          then ()
+                          else raise Fail "AST expression did not reduce to expected value"
+                      val c =
+                          (banner "CPS Transformation";
+                           CPSTransform.transform e)
+                      val () =
+                          (banner "CPS Checking";
+                           CPSCheck.check c)
+                      val () =
+                          (banner "CPS Expression";
+                           print (PPrintCPS.prettyprint c ^ "\n"))
+                      val v =
+                          (banner "CPS Reduction";
+                           CPSEval.eval c)
+                      val r2 =
+                          case extract_cps v of
+                              NONE => raise Fail "CPS expression did not reduce to number"
+                            | SOME r2 => r2
+                      val () =
+                          if r2 = n
+                          then ()
+                          else raise Fail "CPS expression did not reduce to expected value"
+                  in
+                      banner "OK"
+                  end
+              end
       in
-          print "OK\n\n"
+          run_test n e false
+          handle
+          _ => (run_test n e true
+                handle
+                Fail msg => print (msg ^ "\n\n"))
       end
+
 
   val () = run_test 0 zero
 
@@ -62,5 +113,35 @@ struct
       let val x = Variable.fresh("x") in
           run_test 0 (app (lam nat x (var x)) zero)
       end
+
+  val () =
+      let val x = Variable.fresh("x") in
+          run_test 1 (app (lam nat x (succ (var x))) zero)
+      end
+
+  val () =
+      let val x = Variable.fresh("x") in
+          run_test 1 (ifz zero (succ zero) x (var x))
+      end
+
+  val () =
+      let val x = Variable.fresh("x") in
+          run_test 1 (ifz zero (succ zero) x (var x))
+      end
+
+  val () =
+      let
+          val x = Variable.fresh("x")
+          val i = Variable.fresh("i")
+      in
+          run_test 45
+                   (app (lam nat
+                             i
+                             (ifz (var i)
+                                  zero
+                                  x (succ (var x))))
+                        (succ zero))
+      end
+
 
 end

@@ -32,7 +32,7 @@ struct
           "  | 0 => " ^ pprint_exp z ^ "\n" ^
           "  | S " ^ Variable.pprint n' ^ " => " ^ pprint_exp s ^ "\n" ^
           "}"
-        | ELam(t,(x,e)) => "\\ " ^ Variable.pprint x ^ " : " ^ pprint_ty t ^ " . " ^ pprint_exp e
+        | ELam(t,(x,e)) => "\\(" ^ Variable.pprint x ^ " : " ^ pprint_ty t ^ "). " ^ pprint_exp e
         | EFix(t,(x,e)) => "fix " ^ Variable.pprint x ^ " : " ^ pprint_ty t ^ " . " ^ pprint_exp e
         | ESucc e => "S " ^ pprint_exp e
         | EZero => "0"

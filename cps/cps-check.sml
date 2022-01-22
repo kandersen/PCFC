@@ -56,6 +56,8 @@ struct
 
     | check_exp tenv kenv (ELetFun(f, tk, k, tx, x, e1, e2)) =
       ()
+    | check_exp _ _ _  =
+      ()
 
   fun check e =
       check_exp VarMap.empty (KVarMap.singleton(halt, TNat)) e
