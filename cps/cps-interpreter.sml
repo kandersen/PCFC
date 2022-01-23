@@ -47,6 +47,7 @@ struct
               in
                   eval_exp K (vextend env' y (RVSucc x))
               end
+            | _ => raise RuntimeError "Type-error: non-numeral discriminee in ifz"
           )
         | ELetFun(f, _, k, _, y, e, K) =>
           eval_exp K (vextend env f (RVLam(env, k, y, e)))
@@ -54,6 +55,7 @@ struct
           (case vlookup env f of
                RVLam(env',j,y,K) =>
                eval_exp K (kextend (vextend env y (vlookup env x)) j (klookup env k))
+            | _ => raise RuntimeError "Type-error: non-function in application position"
           )
 
 
@@ -64,6 +66,8 @@ struct
           RVZero
         | VSucc x =>
           RVSucc (vlookup env x)
+        | VLam(_, k, _, x, e) =>
+          RVLam(env, k, x, e)
 
   fun eval (e : exp) : runtimevalue =
       eval_exp e emptyenv

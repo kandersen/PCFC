@@ -45,9 +45,7 @@ struct
     | flatten LINE = TEXT " "
     | flatten (OR(x, y)) = flatten x
 
-
   fun group x = OR(flatten x, x)
-
 
   fun copy 0 c = c
     | copy n c = c ^ copy (n - 1) c

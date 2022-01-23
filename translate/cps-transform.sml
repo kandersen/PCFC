@@ -9,7 +9,8 @@ struct
 
   fun transform_exp (e: ILAST.exp) (k : Var.t -> ILCPS.exp) : ILCPS.exp =
       case e of
-          ILAST.EVar x => k x
+          ILAST.EVar x =>
+          k x
         | ILAST.EApp(e1, e2) =>
           transform_exp
               e1
@@ -54,8 +55,7 @@ struct
               transform_exp
                   e1
                   (fn x1 =>
-                      ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VSucc x1, k x)
-                  )
+                      ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VSucc x1, k x))
           end
         | ILAST.EZero =>
           let
@@ -140,6 +140,13 @@ struct
           in
               ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VZero, ILCPS.EAppCont(k, x))
           end
+        | ILAST.EFix _ =>
+          let
+              val x = Var.fresh("x")
+          in
+              ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VZero, ILCPS.EAppCont(k, x))
+          end
+
 
 fun transform (e : ILAST.exp) : ILCPS.exp =
     transform_exp e (fn v => ILCPS.EAppCont(ILCPS.halt, v))

@@ -1,7 +1,7 @@
 signature AST_CHECK =
 sig
     type tenv
-    exception TypeError
+    exception TypeError of string
 
     val check : ILAST.exp -> ILAST.ty option
 end
@@ -11,7 +11,7 @@ struct
   open ILAST
   open Variable
 
-  exception TypeError
+  exception TypeError of string
 
   structure VarDict = VarMap(structure V = Variable)
 
@@ -27,19 +27,26 @@ struct
           end
         | EZero =>
           SOME TNat
-        | EVar v => VarDict.find(tenv, v)
+        | EVar v =>
+          (case VarDict.find(tenv, v) of
+              NONE =>
+              raise TypeError ("Unbound variable: " ^ Variable.disamb v)
+            | SOME t =>
+              SOME t
+          )
         | EApp (f, a) =>
           (case infer tenv f of
               SOME (TArr (t1, t2)) =>
               let val () = assert tenv a t1 in
                   SOME t2
               end
-            | _ => raise TypeError)
+            | _ => raise TypeError "Non-function in function position")
         | ELam(t,(x,e)) =>
           (case infer (VarDict.insert(tenv, x, t)) e of
               SOME t2 =>
               SOME (TArr(t, t2))
-            | NONE => NONE)
+            | NONE => NONE
+          )
         | EFix(t,(x,e)) =>
           let val () = assert (VarDict.insert(tenv, x, t)) e t in
               SOME t
@@ -57,9 +64,9 @@ struct
       case infer tenv e of
           SOME t' =>
           if t <> t'
-          then raise TypeError
+          then raise TypeError "Unsatisfied type constraint"
           else ()
-        | NONE => raise TypeError
+        | NONE => raise TypeError "Uninferable type"
 
   fun check e =
       infer emptytenv e
