@@ -50,6 +50,7 @@ struct
                       val () =
                           (banner "AST Expression";
                            print (pprint_exp e ^ "\n"))
+
                       val () =
                           banner "AST Checking"
                       val t1 =
@@ -60,7 +61,18 @@ struct
                           ASTCheck.TypeError msg =>
                           raise Fail ("AST expression not well-typed:\n  " ^ msg)
                       val () =
-                           print (pprint_ty t1 ^ "\n")
+                          print (pprint_ty t1 ^ "\n")
+
+
+                      val () =
+                          banner "Type Inference"
+                      val tast =
+                          Inference.inference e
+                          handle
+                          Inference.TypeError => raise Fail "TypeError"
+                      val () =
+                          print (TASTSExprs.prettyprint tast ^ "\n")
+
                       val e' =
                           (banner "AST Reduction";
                            ASTContexts.reduce e)
@@ -74,15 +86,21 @@ struct
                           if r1 = n
                           then ()
                           else raise Fail "AST expression did not reduce to expected value"
+
+
                       val c =
                           (banner "CPS Transformation";
                            CPSTransform.transform e)
                       val () =
                           (banner "CPS Expression";
                            print (CPSSExprs.prettyprint c ^ "\n"))
+
+
                       val () =
                           (banner "CPS Checking";
                            CPSCheck.check c)
+
+
                       val v =
                           (banner "CPS Reduction";
                            CPSEval.eval c)

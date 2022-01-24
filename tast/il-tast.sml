@@ -12,18 +12,25 @@ struct
     = EVar of Variable.t
     | EApp of exp * exp
     | EIfz of exp * exp * Variable.t * exp
-    | ELam of ty * Variable.t * exp
-    | EFix of ty * Variable.t * exp
+    | ELam of Variable.t * exp
+    | EFix of Variable.t * exp
     | ESucc of exp
     | EZero
 
-  fun var v t = Exp { exp = EVar v, ty = t }
-  fun app e1 e2 t = Exp { exp = EApp(e1, e2), ty = t }
-  fun ifz e1 e2 x e3 t = Exp { exp = EIfz(e1, e2, x, e3), ty = t }
-  fun lam t1 x e t2 = Exp { exp = ELam(t1, x, e), ty = t2 }
-  fun fix t x e = Exp { exp = EFix(t, x, e), ty = t }
-  fun succ e = Exp { exp = ESucc e, ty = TNat }
-  val zero = Exp { exp = EZero, ty = TNat }
+  fun var t v =
+      Exp { exp = EVar v, ty = t }
+  fun app t e1 e2 =
+      Exp { exp = EApp(e1, e2), ty = t }
+  fun ifz t e1 e2 x e3 =
+      Exp { exp = EIfz(e1, e2, x, e3), ty = t }
+  fun lam t1 t2 x e =
+      Exp { exp = ELam(x, e), ty = ILAST.TArr(t1, t2) }
+  fun fix t x e =
+      Exp { exp = EFix(x, e), ty = t }
+  fun succ e =
+      Exp { exp = ESucc e, ty = ILAST.TNat }
+  val zero =
+      Exp { exp = EZero, ty = ILAST.TNat }
 
   fun typeof (Exp { ty, ... }) = ty
   fun unexp (Exp { exp, ... }) = exp

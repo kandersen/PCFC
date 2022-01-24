@@ -56,7 +56,7 @@ struct
               val () = assert tenv e1 TNat
               val SOME t = infer tenv e2
           in
-              assert (VarDict.insert(tenv, n', t)) e3;
+              assert (VarDict.insert(tenv, n', TNat)) e3 t;
               SOME t
           end
 

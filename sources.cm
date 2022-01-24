@@ -11,6 +11,9 @@ is
   ast/ast-interpreter.sml
   ast/ast-contexts.sml
 
+  tast/il-tast.sml
+  tast/tast-sexprs.sml
+
   cps/il-cps.sml
   cps/cps-pprint.sml
   cps/cps-sexprs.sml
@@ -19,6 +22,8 @@ is
 
   translate/cps-transform.sig
   translate/cps-transform.sml
+  translate/inference.sig
+  translate/inference.sml
 
   main.sml
 

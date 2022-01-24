@@ -2,19 +2,19 @@ structure CPSSExprs =
 struct
   open ILCPS
 
-  fun indent 0 = " "
-    | indent n = " " ^ indent (n - 1)
-
   infix <>
   fun s1 <> s2 = s1 ^ s2
 
   infix <+>
-  fun s1 <+> s2 = s1 ^ " " ^ s2
+  fun s1 <+> s2 = s1 <> " " <> s2
 
   infix </>
   fun s1 </> s2 = s1 <> "\n" <> s2
 
   fun parens s = "(" <> s <> ")"
+
+  fun indent 0 = " "
+    | indent n = " " <> indent (n - 1)
 
   fun ppkont k = KVariable.disamb k
 
@@ -61,7 +61,7 @@ struct
                          )
 
   and ppval i v =
-      indent i ^
+      indent i <>
       (case v of
            VZero =>
            "0"
@@ -70,7 +70,7 @@ struct
          | VLam(tk, k, tx, x, e) =>
            parens ("lambda" <+> format_binding (ppkont k) (ppktype tk)
                             <+> format_binding (ppvar x) (pptype tx)
-                            </> ppexp (i + 2) e)
+                            </> ppexp (i + 4) e)
       )
 
   fun prettyprint (e : exp) =
