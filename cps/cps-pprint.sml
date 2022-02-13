@@ -36,11 +36,11 @@ struct
 
   fun pptype ty =
       case ty of
-          TNat =>
+          ILAST.TNat =>
           text "nat"
-        | TArr(t1, t2) =>
+        | ILAST.TArr(t1, t2) =>
           (case t1 of
-               TArr _ =>
+               ILAST.TArr _ =>
                parens (pptype t1)
              | _ =>
                pptype t1)
@@ -49,9 +49,9 @@ struct
 
   fun ppktype ty =
       case ty of
-          TNat =>
+          ILAST.TNat =>
           text "¬nat"
-        | TArr _ =>
+        | ILAST.TArr _ =>
           text "¬"
           <> parens (pptype ty)
 

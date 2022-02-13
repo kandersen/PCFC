@@ -63,16 +63,6 @@ struct
                       val () =
                           print (pprint_ty t1 ^ "\n")
 
-
-                      val () =
-                          banner "Type Inference"
-                      val tast =
-                          Inference.inference e
-                          handle
-                          Inference.TypeError => raise Fail "TypeError"
-                      val () =
-                          print (TASTSExprs.prettyprint tast ^ "\n")
-
                       val e' =
                           (banner "AST Reduction";
                            ASTContexts.reduce e)
@@ -88,9 +78,20 @@ struct
                           else raise Fail "AST expression did not reduce to expected value"
 
 
+                      val () =
+                          banner "Type Inference"
+                      val tast =
+                          Inference.inference e
+                          handle
+                          Inference.TypeError => raise Fail "TypeError"
+                      val () =
+                          print (TASTSExprs.prettyprint tast ^ "\n")
+
+
+
                       val c =
                           (banner "CPS Transformation";
-                           CPSTransform.transform e)
+                           CPSTransform.transform tast)
                       val () =
                           (banner "CPS Expression";
                            print (CPSSExprs.prettyprint c ^ "\n"))
@@ -205,7 +206,7 @@ struct
           val n = Variable.fresh("n")
           val n' = Variable.fresh("n'")
       in
-          run_test 0 (app
+          test 0 (app
                       (app
                            (lam nat m
                                 (lam nat n
@@ -218,7 +219,7 @@ struct
                            (succ zero)
                       )
                       zero
-                 ) true
+                 )
       end
 
   val () =
@@ -265,7 +266,7 @@ struct
                    )
               )
       in
-          test 3 (app (app (app plusF omega) zero) (embed 3))
+          run_test 3 (app (app (app plusF omega) zero) (embed 3)) true
       end
 
 

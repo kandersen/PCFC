@@ -1,13 +1,19 @@
 structure TASTSExprs =
 struct
   open ILTAST
-  open PPrint
 
   infix <>
+  fun s1 <> s2 = s1 ^ s2
+
   infix <+>
+  fun s1 <+> s2 = s1 <> " " <> s2
+
   infix </>
+  fun s1 </> s2 = s1 <> "\n" <> s2
 
   fun parens s = "(" <> s <> ")"
+
+  fun format_binding n t = parens (n <+> ":" <+> t)
 
   fun indent 0 = ""
     | indent n = " " <> indent (n - 1)
@@ -24,8 +30,6 @@ struct
       in
           ppposty ty
       end
-
-  fun format_binding n t = parens (n <+> ":" <+> t)
 
   fun ppexp i e =
       let val t = pptype (typeof e) in

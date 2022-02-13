@@ -22,15 +22,15 @@ struct
 
   fun pptype ty =
       let
-          fun ppposty TNat = "nat"
-            | ppposty (TArr(t1, t2)) = ppnegty t1 <+> "->" <+> ppposty t2
-          and ppnegty TNat = "nat"
+          fun ppposty ILAST.TNat = "nat"
+            | ppposty (ILAST.TArr(t1, t2)) = ppnegty t1 <+> "->" <+> ppposty t2
+          and ppnegty ILAST.TNat = "nat"
             | ppnegty t = parens (ppposty t)
       in
           ppposty ty
       end
 
-  fun ppktype TNat = "¬nat"
+  fun ppktype ILAST.TNat = "¬nat"
     | ppktype t = "¬" <> parens (pptype t)
 
 

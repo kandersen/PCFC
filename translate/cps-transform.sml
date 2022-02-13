@@ -4,14 +4,13 @@ struct
   structure Var = ILCPS.Variable
   structure KVar = ILCPS.KVariable
 
-  fun transform_type (t : ILAST.ty) : ILCPS.ty =
-    ILCPS.TNat
+  fun transform_type (t : ILTAST.ty) : ILCPS.ty = t
 
-  fun transform_exp (e: ILAST.exp) (k : Var.t -> ILCPS.exp) : ILCPS.exp =
-      case e of
-          ILAST.EVar x =>
+  fun transform_exp (ILTAST.Exp { exp, ty } : ILTAST.exp) (k : Var.t -> ILCPS.exp) : ILCPS.exp =
+      case exp of
+          ILTAST.EVar x =>
           k x
-        | ILAST.EApp(e1, e2) =>
+        | ILTAST.EApp(e1, e2) =>
           transform_exp
               e1
               (fn x1 =>
@@ -22,9 +21,9 @@ struct
                               val k' = KVar.fresh("k")
                               val x' = Var.fresh("x")
                           in
-                              ILCPS.ELetCont(k', ILCPS.TNat, x', k x', ILCPS.EAppFun(x1, k', x2))
+                              ILCPS.ELetCont(k', ILAST.TNat, x', k x', ILCPS.EAppFun(x1, k', x2))
                           end))
-        | ILAST.EIfz(i, z, (x, s)) =>
+        | ILTAST.EIfz(i, z, x, s) =>
           transform_exp
               i
               (fn n =>
@@ -35,60 +34,68 @@ struct
                       val unused = Var.fresh("_")
                       val ks = KVar.fresh("k")
                   in
-                      ILCPS.ELetCont(j, ILCPS.TNat, jx, k jx,
-                                     ILCPS.ELetCont(kz, ILCPS.TNat, unused, transform_val z j,
-                                                    ILCPS.ELetCont(ks, ILCPS.TNat, x, transform_val s j,
+                      ILCPS.ELetCont(j, ILAST.TNat, jx, k jx,
+                                     ILCPS.ELetCont(kz, ILAST.TNat, unused, transform_val z j,
+                                                    ILCPS.ELetCont(ks, ILAST.TNat, x, transform_val s j,
                                                                    ILCPS.EIfz(n, kz, ks))))
                   end
               )
-        | ILAST.ELam(ty, (x, e)) =>
+        | ILTAST.ELam(x, e) =>
           let
               val f = Var.fresh("f")
               val k' = KVar.fresh("k")
           in
-              ILCPS.ELetFun(f, transform_type ty, k', ILCPS.TNat, x, transform_val e k', k f)
+              ILCPS.ELetFun(f, transform_type ty, k', ILAST.TNat, x, transform_val e k', k f)
           end
-        | ILAST.ESucc e1 =>
+        | ILTAST.ESucc e1 =>
           let
               val x = Var.fresh("x")
           in
               transform_exp
                   e1
                   (fn x1 =>
-                      ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VSucc x1, k x))
+                      ILCPS.ELetVal(ILAST.TNat, x, ILCPS.VSucc x1, k x))
           end
-        | ILAST.EZero =>
+        | ILTAST.EZero =>
           let
               val x = Var.fresh("x")
           in
-              ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VZero, k x)
+              ILCPS.ELetVal(ILAST.TNat, x, ILCPS.VZero, k x)
           end
-        | ILAST.EFix(ty, (t, e1)) =>
+        | ILTAST.EFix _ =>
           let
-              val k' = KVar.fresh("k")
-              val unused = Var.fresh("_")
               val x = Var.fresh("x")
-              val k'' = KVar.fresh("k")
-              val zero = Var.fresh("zero")
           in
-              ILCPS.ELetCont(
-                  k'', transform_type ty, x, k x,
-                  ILCPS.ELetFun(
-                      t,
-                      ILCPS.TArr(ILCPS.TNat, transform_type ty),
-                      k',
-                      ILCPS.TNat,
-                      unused,
-                      transform_val (ASTInterpreter.subst (ILAST.EApp(ILAST.EVar t, ILAST.EZero)) t e1) k',
-                      ILCPS.ELetVal(ILCPS.TNat, zero, ILCPS.VZero, ILCPS.EAppFun(t,k'',zero))))
+              ILCPS.ELetVal(ILAST.TNat, x, ILCPS.VZero, k x)
           end
 
+        (* | ILTAST.EFix(t, e1) => *)
+        (*   let *)
+        (*       val fixtype = ILTAST.typeof e *)
+        (*       val k' = KVar.fresh("k") *)
+        (*       val unused = Var.fresh("_") *)
+        (*       val x = Var.fresh("x") *)
+        (*       val k'' = KVar.fresh("k") *)
+        (*       val zero = Var.fresh("zero") *)
+        (*   in *)
+        (*       ILCPS.ELetCont( *)
+        (*           k'', transform_type , x, k x, *)
+        (*           ILCPS.ELetFun( *)
+        (*               t, *)
+        (*               ILAST.TArr(ILAST.TNat, transform_type fixtype, *)
+        (*               k', *)
+        (*               ILAST.TNat, *)
+        (*               unused, *)
+        (*               transform_val (ASTInterpreter.subst (ILAST.EApp(ILAST.EVar t, ILAST.EZero)) t e1) k', *)
+        (*               ILCPS.ELetVal(ILAST.TNat, zero, ILCPS.VZero, ILCPS.EAppFun(t,k'',zero)))) *)
+        (*   end *)
 
-  and transform_val (e : ILAST.exp) (k : KVar.t) : ILCPS.exp =
-      case e of
-          ILAST.EVar x =>
+
+  and transform_val (ILTAST.Exp { exp, ty } : ILTAST.exp) (k : KVar.t) : ILCPS.exp =
+      case exp of
+          ILTAST.EVar x =>
           ILCPS.EAppCont(k, x)
-        | ILAST.EApp(e1, e2) =>
+        | ILTAST.EApp(e1, e2) =>
           transform_exp
               e1
               (fn x1 =>
@@ -96,7 +103,7 @@ struct
                       e2
                       (fn x2 =>
                           ILCPS.EAppFun(x1, k, x2)))
-        | ILAST.EIfz(i, z, (x, s)) =>
+        | ILTAST.EIfz(i, z, x, s) =>
           transform_exp
               i
               (fn n =>
@@ -106,49 +113,50 @@ struct
                       val ks = KVar.fresh("k")
                   in
                       ILCPS.ELetCont(
-                          kz, ILCPS.TNat, unused, transform_val z k,
+                          kz, ILAST.TNat, unused, transform_val z k,
                           ILCPS.ELetCont(
-                              ks, ILCPS.TNat, x, transform_val s k,
+                              ks, ILAST.TNat, x, transform_val s k,
                               ILCPS.EIfz(n, kz, ks)))
                   end
               )
-        | ILAST.ELam(ty, (x, e1)) =>
+        | ILTAST.ELam(x, e1) =>
           let
+              val (ILAST.TArr(t1, t2)) = ty
               val f = Var.fresh("f")
               val j = KVar.fresh("j")
           in
               ILCPS.ELetVal(
                   transform_type ty,
                   f,
-                  ILCPS.VLam(transform_type ty, j, ILCPS.TNat, x, transform_val e1 j),
+                  ILCPS.VLam(transform_type t2, j, transform_type t1, x, transform_val e1 j),
                   ILCPS.EAppCont(k, f)
               )
           end
-        | ILAST.ESucc e1 =>
+        | ILTAST.ESucc e1 =>
           let
               val x = Var.fresh("x")
           in
               transform_exp
                   e1
                   (fn x1 =>
-                      ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VSucc x1, ILCPS.EAppCont(k, x))
+                      ILCPS.ELetVal(ILAST.TNat, x, ILCPS.VSucc x1, ILCPS.EAppCont(k, x))
                   )
           end
-        | ILAST.EZero =>
+        | ILTAST.EZero =>
           let
               val x = Var.fresh("x")
           in
-              ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VZero, ILCPS.EAppCont(k, x))
+              ILCPS.ELetVal(ILAST.TNat, x, ILCPS.VZero, ILCPS.EAppCont(k, x))
           end
-        | ILAST.EFix _ =>
+        | ILTAST.EFix _ =>
           let
               val x = Var.fresh("x")
           in
-              ILCPS.ELetVal(ILCPS.TNat, x, ILCPS.VZero, ILCPS.EAppCont(k, x))
+              ILCPS.ELetVal(ILAST.TNat, x, ILCPS.VZero, ILCPS.EAppCont(k, x))
           end
 
 
-fun transform (e : ILAST.exp) : ILCPS.exp =
+fun transform (e : ILTAST.exp) : ILCPS.exp =
     transform_exp e (fn v => ILCPS.EAppCont(ILCPS.halt, v))
 
 end

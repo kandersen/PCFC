@@ -4,7 +4,9 @@ is
   $/smlnj-lib.cm
 
   common/variable.sml
+  common/prettyprint.sml
   common/pprint.sig
+
 
   ast/il-ast.sml
   ast/ast-check.sml
@@ -20,10 +22,10 @@ is
   cps/cps-check.sml
   cps/cps-interpreter.sml
 
+
   translate/cps-transform.sig
   translate/cps-transform.sml
   translate/inference.sig
   translate/inference.sml
 
-  main.sml
-
+  (* main.sml *)

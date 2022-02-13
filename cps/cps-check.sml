@@ -29,7 +29,7 @@ struct
           ()
       end
 
-  fun infer_exp tenv kenv e = TNat
+  fun infer_exp tenv kenv e = ILAST.TNat
 
   and check_val tenv kenv TNat VZero =
       ()
@@ -41,7 +41,7 @@ struct
           check_cont tenv kenv k tv
       end
     | check_exp tenv kenv (EAppFun(f, k, x)) =
-      let val (TArr(t1,t2)) = infer_var tenv kenv f
+      let val (ILAST.TArr(t1,t2)) = infer_var tenv kenv f
           val () = check_cont tenv kenv k t2
           val () = check_var tenv kenv x t1
       in
@@ -60,6 +60,6 @@ struct
       ()
 
   fun check e =
-      check_exp VarMap.empty (KVarMap.singleton(halt, TNat)) e
+      check_exp VarMap.empty (KVarMap.singleton(halt, ILAST.TNat)) e
 
 end

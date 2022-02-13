@@ -1,7 +1,7 @@
 structure ILCPS =
 struct
-  structure Variable = ILAST.Variable
-  structure VarMap = ILAST.VarMap
+  structure Variable = ILTAST.Variable
+  structure VarMap = ILTAST.VarMap
   structure KVariable = Variable()
   structure KVarMap = VarMap(structure V = KVariable)
 
@@ -10,9 +10,7 @@ struct
 
   val halt : cont = KVariable.fresh("halt")
 
-  datatype ty
-    = TArr of ty * ty
-    | TNat
+  type ty = ILTAST.ty
 
   datatype value
     = VZero

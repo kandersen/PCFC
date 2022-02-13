@@ -1,4 +1,4 @@
 signature CPS_TRANSFORM =
 sig
-    val transform : ILAST.exp -> ILCPS.exp
+    val transform : ILTAST.exp -> ILCPS.exp
 end
