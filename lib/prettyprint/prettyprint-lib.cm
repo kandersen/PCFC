@@ -1,8 +1,9 @@
 Library
-  signature PRETTYPRINT
+  signature DOC
   structure PrettyPrint
 is
   $/basis.cm
 
-  prettyprint.sig
+  doc.sig
+  doc.sml
   prettyprint.sml
