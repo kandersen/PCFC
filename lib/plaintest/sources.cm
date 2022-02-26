@@ -1,8 +1,0 @@
-Library
-  signature TEST
-  structure Test
-is
-  ../prettyprint/sources.cm
-
-  plaintest.sig
-  plaintest.sml

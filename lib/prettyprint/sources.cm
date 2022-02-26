@@ -1,0 +1,9 @@
+Library
+  signature DOC
+  structure PrettyPrint
+is
+  $/basis.cm
+
+  doc.sig
+  doc.sml
+  prettyprint.sml

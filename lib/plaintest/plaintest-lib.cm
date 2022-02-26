@@ -1,0 +1,8 @@
+Library
+  signature TEST
+  structure Test
+is
+  ../prettyprint/prettyprint-lib.cm
+
+  test.sig
+  test.sml
