@@ -49,75 +49,75 @@ struct
                   let
                       val () =
                           (banner "AST Expression";
-                           print (pprint_exp e ^ "\n"))
+                           print (ASTPPrint.print e ^ "\n"))
 
-                      val () =
-                          banner "AST Checking"
-                      val t1 =
-                          (case ASTCheck.check e of
-                              NONE =>  raise Fail "AST expression not well-typed"
-                            | SOME t1 => t1)
-                          handle
-                          ASTCheck.TypeError msg =>
-                          raise Fail ("AST expression not well-typed:\n  " ^ msg)
-                      val () =
-                          print (pprint_ty t1 ^ "\n")
+                      (* val () = *)
+                      (*     banner "AST Checking" *)
+                      (* val t1 = *)
+                      (*     (case ASTCheck.check e of *)
+                      (*         NONE =>  raise Fail "AST expression not well-typed" *)
+                      (*       | SOME t1 => t1) *)
+                      (*     handle *)
+                      (*     ASTCheck.TypeError msg => *)
+                      (*     raise Fail ("AST expression not well-typed:\n  " ^ msg) *)
+                      (* val () = *)
+                      (*     print (pprint_ty t1 ^ "\n") *)
 
-                      val e' =
-                          (banner "AST Reduction";
-                           ASTContexts.reduce e)
-                      val r1 =
-                          case extract e' of
-                              NONE => raise Fail ("AST expression did not reduce to number:\n  " ^ pprint_exp e')
-                            | SOME r1 => r1
-                      val () =
-                          print (Int.toString r1 ^ "\n")
-                      val () =
-                          if r1 = n
-                          then ()
-                          else raise Fail "AST expression did not reduce to expected value"
-
-
-                      val () =
-                          banner "Type Inference"
-                      val tast =
-                          Inference.inference e
-                          handle
-                          Inference.TypeError => raise Fail "TypeError"
-                      val () =
-                          print (TASTSExprs.prettyprint tast ^ "\n")
+                      (* val e' = *)
+                      (*     (banner "AST Reduction"; *)
+                      (*      ASTContexts.reduce e) *)
+                      (* val r1 = *)
+                      (*     case extract e' of *)
+                      (*         NONE => raise Fail ("AST expression did not reduce to number:\n  " ^ pprint_exp e') *)
+                      (*       | SOME r1 => r1 *)
+                      (* val () = *)
+                      (*     print (Int.toString r1 ^ "\n") *)
+                      (* val () = *)
+                      (*     if r1 = n *)
+                      (*     then () *)
+                      (*     else raise Fail "AST expression did not reduce to expected value" *)
 
 
-
-                      val c =
-                          (banner "CPS Transformation";
-                           CPSTransform.transform tast)
-                      val () =
-                          (banner "CPS Expression";
-                           print (CPSSExprs.prettyprint c ^ "\n"))
-
-
-                      val () =
-                          (banner "CPS Checking";
-                           CPSCheck.check c)
+                      (* val () = *)
+                      (*     banner "Type Inference" *)
+                      (* val tast = *)
+                      (*     Inference.inference e *)
+                      (*     handle *)
+                      (*     Inference.TypeError => raise Fail "TypeError" *)
+                      (* val () = *)
+                      (*     print (TASTSExprs.prettyprint tast ^ "\n") *)
 
 
-                      val v =
-                          (banner "CPS Reduction";
-                           CPSEval.eval c)
-                          handle
-                          CPSEval.RuntimeError msg => raise Fail ("CPS expression runtime failure:\n  " ^ msg)
-                      val r2 =
-                          case extract_cps v of
-                              NONE => raise Fail "CPS expression did not reduce to number"
-                            | SOME r2 => r2
-                      val () =
-                          if r2 = n
-                          then ()
-                          else raise Fail (
-                                  "CPS expression did not reduce to expected value:\n"
-                                  ^ "  expected: " ^ Int.toString n ^ "\n"
-                                  ^ "  actual:   " ^ Int.toString r2 ^ "\n")
+
+                      (* val c = *)
+                      (*     (banner "CPS Transformation"; *)
+                      (*      CPSTransform.transform tast) *)
+                      (* val () = *)
+                      (*     (banner "CPS Expression"; *)
+                      (*      print (CPSSExprs.prettyprint c ^ "\n")) *)
+
+
+                      (* val () = *)
+                      (*     (banner "CPS Checking"; *)
+                      (*      CPSCheck.check c) *)
+
+
+                      (* val v = *)
+                      (*     (banner "CPS Reduction"; *)
+                      (*      CPSEval.eval c) *)
+                      (*     handle *)
+                      (*     CPSEval.RuntimeError msg => raise Fail ("CPS expression runtime failure:\n  " ^ msg) *)
+                      (* val r2 = *)
+                      (*     case extract_cps v of *)
+                      (*         NONE => raise Fail "CPS expression did not reduce to number" *)
+                      (*       | SOME r2 => r2 *)
+                      (* val () = *)
+                      (*     if r2 = n *)
+                      (*     then () *)
+                      (*     else raise Fail ( *)
+                      (*             "CPS expression did not reduce to expected value:\n" *)
+                      (*             ^ "  expected: " ^ Int.toString n ^ "\n" *)
+                      (*             ^ "  actual:   " ^ Int.toString r2 ^ "\n") *)
                   in
                       banner "OK"
                   end
@@ -266,7 +266,7 @@ struct
                    )
               )
       in
-          run_test 3 (app (app (app plusF omega) zero) (embed 3)) true
+          run_test 4 (app (app (app plusF omega) zero) (embed 3)) true
       end
 
 
@@ -310,4 +310,6 @@ struct
                            (embed 3)) false)
       end
 
-end
+end;
+
+    print "test";

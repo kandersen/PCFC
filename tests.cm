@@ -1,0 +1,13 @@
+Group
+  structure AllTests
+  structure Test
+is
+  $/basis.cm
+
+  lib/plaintest/sources.cm
+  lib/prettyprint/sources.cm
+
+  test/basic-tests.sml
+  test/prettyprint-tests.sml
+
+  test/all-tests.sml
