@@ -13,7 +13,10 @@ Work in progress.
 - [X] Prettyprinting
 
 ### Testing infrastructure
-- [ ] Basic library
+- [X] Basic library
 - [ ] Executable
-- [ ] Test runner
+- [X] Test runner
 - [ ] Test filtering/querying
+  + [ ] At it's most basic: list of tags
+  + [ ] output as test query
+  + [ ] result of tests as comments
