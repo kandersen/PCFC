@@ -4,8 +4,8 @@ Group
 is
   $/basis.cm
 
-  lib/plaintest/sources.cm
-  lib/prettyprint/sources.cm
+  lib/plaintest/plaintest-lib.cm
+  lib/prettyprint/prettyprint-lib.cm
 
   test/basic-tests.sml
   test/prettyprint-tests.sml
