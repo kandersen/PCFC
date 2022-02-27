@@ -8,10 +8,16 @@ val tests =
         BasicTests.tests
     ]
 
-fun main (name,args) = let
-    val () = executeTest [] tests
-in
-    OS.Process.success
-end
 
+fun main (name,args) =
+    let
+        val expectations =
+            case args of
+                [] => []
+              | [query] =>
+                parseExpectations query
+        val () = executeTest expectations tests
+    in
+        OS.Process.success
+    end
 end

@@ -13,5 +13,6 @@ sig
 
     type exp = string list
 
+    val parseExpectations : string -> exp
     val executeTest : exp -> t -> unit
 end

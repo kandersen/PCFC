@@ -4,7 +4,6 @@ struct
   open PrettyPrint
 
   infix <+>
-  infix <>
 
   fun render_test (l, expected, t) =
       label l (test (fn () => assertEqString expected (render t)))
@@ -43,16 +42,8 @@ struct
                                ("indented stack",
                                 "  a\n  b\n  c",
                                 indent 2 (stack (map text ["a", "b", "c"])))
-
                     ]))
-
           ]
-
       )
 
-  fun main (name,args) = let
-      val () = executeTest [] tests
-  in
-      OS.Process.success
-  end
 end

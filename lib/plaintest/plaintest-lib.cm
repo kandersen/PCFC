@@ -2,6 +2,7 @@ Library
   signature TEST
   structure Test
 is
+  $/basis.cm
   ../prettyprint/prettyprint-lib.cm
 
   test.sig

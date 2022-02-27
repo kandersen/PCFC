@@ -147,4 +147,7 @@ struct
                               <+> number (succeeded + failed)
                               <+> text "tests ran." <> endl))
       end
+
+  val parseExpectations =
+      String.tokens (fn c => c = #":")
 end
