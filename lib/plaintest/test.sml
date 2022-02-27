@@ -131,6 +131,8 @@ struct
           }
       end
 
+  val hash = text "#"
+
   fun executeTest (e : exp) (t : t) : unit =
       let
           val { msg, succeeded, failed } = exec e t
@@ -139,13 +141,13 @@ struct
           print (
               render (
                   if failed = 0
-                  then text "All"
+                  then hash <+> text "All"
                             <+> number succeeded
                             <+> text "tests pass!" <> endl
-                  else number failed
-                              <+> text "failures" <> text ","
-                              <+> number (succeeded + failed)
-                              <+> text "tests ran." <> endl))
+                  else hash <+>number failed
+                            <+> text "failures" <> text ","
+                            <+> number (succeeded + failed)
+                            <+> text "tests ran." <> endl))
       end
 
   val parseExpectations =

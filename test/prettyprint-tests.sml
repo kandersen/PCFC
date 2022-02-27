@@ -6,7 +6,9 @@ struct
   infix <+>
 
   fun render_test (l, expected, t) =
-      label l (test (fn () => assertEqString expected (render t)))
+      label l (
+          test (fn () =>
+                   assertEqString expected (render t)))
 
   val tests =
       label "prettyprint-tests" (

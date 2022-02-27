@@ -1,7 +1,6 @@
 structure PrettyPrint =
 struct
     open Doc
-    infix <>
 
     val number = text o Int.toString
 
